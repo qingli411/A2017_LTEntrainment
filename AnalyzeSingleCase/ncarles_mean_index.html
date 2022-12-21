@@ -1,0 +1,154 @@
+<!DOCTYPE HTML>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="description" content="A page for NCAR LES profiles diags">
+        <title>NCAR LES profles</title>
+        <style>
+            div.container {
+                display:inline-block;
+            }
+            h1 {
+                text-align:left;
+            }
+            p.label {
+                text-align: center;
+                font-family: Arial
+            }
+            img {
+                height: 200;
+                width: auto;
+            }
+            div.image {
+                margin: auto;
+            }
+        </style>
+        <script type="text/javascript" src="http://latex.codecogs.com/latexit.js"></script>
+    </head>
+    <body>
+        <h1>NCAR LES profiles</h1>
+        <p>Time averaged (AVGST s to AVGED s) vertical profiles for the case CASE_NAME</p>
+	<p>u* = UTAU m/s; B0 = WTSFC W/m^2; f = FCOR s^-1</p>
+        <h2>Mean Velocity</h2>
+        <div class="image">
+            <div class="container">
+            <img src="./stokes.gif" height="200"/>
+                <p class="label">Stokes drift</p>
+            </div>
+            <div class="container">
+            <img src="./uxym.gif" height="200"/>
+                <p class="label">Mean u</p>
+            </div>
+            <div class="container">
+            <img src="./vxym.gif" height="200"/>
+                <p class="label">Mean v</p>
+            </div>
+            <div class="container">
+            <img src="./lagrangianUxym.gif" height="200"/>
+                <p class="label">Mean u + Stokes dirft</p>
+            </div>
+        </div>
+        <div class="image">
+            <div class="container">
+            <img src="hodograph.gif" height="300"/>
+                <p class="label">Hodograph</p>
+            </div>
+        </div>
+        <h2>TKE</h2>
+        <div class="image">
+            <div class="container">
+            <img src="./ups.gif" height="200"/>
+                <p class="label">u' squared</p>
+            </div>
+            <div class="container">
+            <img src="./vps.gif" height="200"/>
+                <p class="label">v' squared</p>
+            </div>
+            <div class="container">
+            <img src="./wps.gif" height="200"/>
+                <p class="label">w' squared</p>
+            </div>
+            <div class="container">
+            <img src="tke.gif" height="200"/>
+                <p class="label">TKE</p>
+            </div>
+        </div>
+        <h2>Momentum Fluxes</h2>
+        <div class="image">
+            <div class="container">
+            <img src="./uw.gif" height="200"/>
+                <p class="label">Momentum flux (u'w')</p>
+            </div>
+            <div class="container">
+            <img src="./vw.gif" height="200"/>
+                <p class="label">Momentum flux (v'w')</p>
+            </div>
+            <div class="container">
+            <img src="./uv.gif" height="200"/>
+                <p class="label">Momentum flux (u'v')</p>
+            </div>
+        </div>
+        <h2>TKE Budget</h2>
+        <div class="image">
+            <div class="container">
+            <img src="./buoyflux.gif" height="200"/>
+                <p class="label">Buoyancy flux</p>
+            </div>
+            <div class="container">
+            <img src="./stokesProd.gif" height="200"/>
+                <p class="label">Stokes production</p>
+            </div>
+            <div class="container">
+            <img src="./shearProd.gif" height="200"/>
+                <p class="label">Shear production</p>
+            </div>
+            <div class="container">
+            <img src="./tkeTrans.gif" height="200"/>
+                <p class="label">TKE transport</p>
+            </div>
+            <div class="container">
+            <img src="./dissipation.gif" height="200"/>
+                <p class="label">TKE dissipation</p>
+            </div>
+            <div class="container">
+            <img src="./stokesShearProd.gif" height="200"/>
+                <p class="label">Stokes + Shear prod.</p>
+            </div>
+        </div>
+        <h2>Other</h2>
+        <div class="image">
+            <div class="container">
+            <img src="N2.gif" height="200"/>
+                <p class="label">N2</p>
+            </div>
+            <div class="container">
+            <img src="tps.gif" height="200"/>
+                <p class="label">T' squared</p>
+            </div>
+            <div class="container">
+            <img src="wSkewness.gif" height="200"/>
+                <p class="label">Skewness of w</p>
+            </div>
+        </div>
+        <h2>Anisotropy</h2>
+        <div class="image">
+            <div class="container">
+            <img src="BarycentricMap.gif" height="250"/>
+                <p class="label">Barycentric map</p>
+            </div>
+            <div class="container">
+            <img src="EigenVDir.gif" height="250"/>
+                <p class="label">Eigen Vector Direction</p>
+            </div>
+        </div>
+        <div class="image">
+            <div class="container">
+            <img src="AnisoPfl.gif" height="300">
+                <p class="label">Anisotropy tensor</p>
+            </div>
+        </div>
+    </body>
+
+</html>
+
+
