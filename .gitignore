@@ -1,2 +1,5 @@
 *.nc
+*.pdf
+*.asv
+Figures/LF17_Data_ParSpaceCESM.mat
 .DS_Store

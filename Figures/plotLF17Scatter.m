@@ -1,6 +1,6 @@
  close all; clear variables;
 % This script plots scatters of all cases in Li and Fox-Kemper, 2017.
-% Figures 5-8.
+% Figures 2a, 5-8, and 9a.
 
 % flag for saving figures. 0: do not save, 1: save
 l_save_fig = 1;
@@ -32,6 +32,8 @@ stat_wb_p75 = dat.stat_wb_p75;
 
 % Langmuir number
 la = sqrt(utau./us);
+% h/LL
+hL = b0.*hb./utau.^2./us;
 
 % fitting for entrainment buoyancy flux
 wgt = utau.^3./hb;
@@ -46,6 +48,101 @@ yf1(isnan(yf1)) = [];
 
 % color gray
 c_gray = [0.5 0.5 0.5];
+
+%% Figure 2a: parameter space
+newFigure(l_save_fig);
+
+% Reproduce Fig. 3 in Belcher et al., 2012
+xlims = [0.1,10];   % La
+ylims = [1e-3,1e3]; % h/LL
+
+% color contour (background)
+nx = 500;
+ny = 500;
+xx = logspace(log10(xlims(1)),log10(xlims(2)),nx);
+yy = logspace(log10(ylims(1)),log10(ylims(2)),ny);
+zz = zeros(nx,ny);
+zz1 = zz;
+zz2 = zz;
+zz3 = zz;
+for i = 1:nx
+for j = 1:ny
+    zz1(j,i) = 2.*(1-exp(-0.5.*xx(i)));
+    zz2(j,i) = 0.22.*xx(i).^(-2);
+    zz3(j,i) = 0.3.*xx(i).^(-2).*yy(j);
+end
+end
+zz = zz1 + zz2 + zz3;
+
+hold on;
+colormap('summer');
+[~,p] = contourf(xx,yy,log10(zz));
+p.LevelList = [-0.1, 0, 0.1, 0.25, 0.5, 1, 2, 3];
+p.ShowText = 'on';
+p.LineColor = [0.3 0.3 0.3];
+
+[~,p] = contour(xx,yy,zz1./zz);
+p.LevelList = 0.9;
+p.LineWidth = 1.5;
+p.LineColor = 'k';
+[~,p] = contour(xx,yy,zz2./zz);
+p.LevelList = 0.9;
+p.LineWidth = 1.5;
+p.LineColor = 'k';
+[~,p] = contour(xx,yy,zz3./zz);
+p.LevelList = 0.9;
+p.LineWidth = 1.5;
+p.LineColor = 'k';
+
+% white contour (parameter space in CESM)
+hstdat = load('wstar3ustar2uS_LaTurb.mat');
+plot_dist_4p_l(hstdat.hst,hstdat.xi,hstdat.yi);
+
+% scatter data points
+ids3w = 2:5;
+ids3s = 6:nWV;
+xdat0 = la;
+ydat0 = hL;
+zdat0 = log10(eps./utau.^3.*hb);
+% group 1, wind waves
+xdat = xdat0(:,1,ids3w);
+ydat = ydat0(:,1,ids3w);
+plot(xdat(:),ydat(:),'ow','LineWidth',1.0);
+xdat = xdat0(:,2,ids3w);
+ydat = ydat0(:,2,ids3w);
+plot(xdat(:),ydat(:),'sw','LineWidth',1.0);
+xdat = xdat0(:,3,ids3w);
+ydat = ydat0(:,3,ids3w);
+plot(xdat(:),ydat(:),'dw','LineWidth',1.0);
+% group 2, swells
+xdat = xdat0(:,1,ids3s);
+ydat = ydat0(:,1,ids3s);
+scatter(xdat(:),ydat(:),'ow','filled');
+xdat = xdat0(:,2,ids3s);
+ydat = ydat0(:,2,ids3s);
+scatter(xdat(:),ydat(:),'sw','filled');
+xdat = xdat0(:,3,ids3s);
+ydat = ydat0(:,3,ids3s);
+scatter(xdat(:),ydat(:),'dw','filled');
+set(gca,'xscale','log');
+set(gca,'yscale','log');
+xlabel('$La_\mathrm{t}$','Interpreter','latex');
+ylabel('$h_\mathrm{b}/L_\mathrm{L}$','Interpreter','latex');
+xlim([0.1 10]);
+ylim([1e-3,1e3]);
+
+tx = text(0.11, 2e-3,'Langmuir','Interpreter','Latex');
+tx.BackgroundColor = 'w';
+tx = text(3, 2e-2,'Wind','Interpreter','Latex');
+tx.BackgroundColor = 'w';
+tx = text(0.13, 1e2,'Convection','Interpreter','Latex');
+tx.BackgroundColor = 'w';
+
+if (l_save_fig)
+    figname = 'fig2a_sct_ParSpace.pdf';
+    postProcessFig(gcf, figname, 5, 5);
+end
+
 
 %% Figure 5a: wps vs surface buoyancy flux (w*^2)
 newFigure(l_save_fig);
@@ -121,6 +218,7 @@ lg = legend([p1, p2],eq_str,eq2_str);
 lg.Location = 'NorthEast';
 lg.Interpreter = 'Latex';
 lg.Color = 'none';
+lg.AutoUpdate = 'off';
 ids2 = 1;
 ids3 = 1:nWV;
 for ids1=3:nBF
@@ -191,6 +289,7 @@ eq3_str = ['$0.640+3.50\exp(-2.69 La_\mathrm{SL})\;$'...
 lg = legend([p1, p2, p3],eq_str,eq2_str,eq3_str);
 lg.Location = 'NorthEast';
 lg.Interpreter = 'Latex';
+lg.AutoUpdate = 'off';
 ids2 = 1;
 ids3 = 1:nWV;
 for ids1=3:nBF
@@ -533,6 +632,119 @@ if (l_save_fig)
     postProcessFig(gcf, figname);
 end
 
+%% Figure 9a: regime diagram for entrainment
+newFigure(l_save_fig);
+
+xlims = [0.1,20];   % Lasl
+ylims = [0.01,200]; % -hb/L
+
+c1 = 0.17;
+c2 = 0.15;
+c3 = 0.083;
+nx = 500;
+ny = 500;
+xx = logspace(log10(xlims(1)),log10(xlims(2)),nx);
+yy = logspace(log10(ylims(1)),log10(ylims(2)),ny);
+zz = zeros(nx,ny);
+zz1 = zz;
+zz2 = zz;
+zz3 = zz;
+for i = 1:nx
+for j = 1:ny
+    zz1(j,i) = c1;
+    zz2(j,i) = c3.*xx(i).^(-2);
+    zz3(j,i) = c2.*yy(j);
+end
+end
+zz = zz1 + zz2 + zz3;
+
+% color countour (background)
+hold on;
+colormap('summer');
+[C,p] = contourf(xx,yy,log10(zz));
+p.ShowText = 'on';
+p.LineColor = [0.3 0.3 0.3];
+p.LabelSpacing = 500;
+p.TextStep = 0.2;
+clabel(C,p,'Color',[0.3 0.3 0.3]);
+
+[~,p] = contour(xx,yy,zz1./zz);
+p.LevelList = 0.9;
+p.LineWidth = 1.5;
+p.LineColor = 'k';
+[~,p] = contour(xx,yy,zz2./zz);
+p.LevelList = 0.9;
+p.LineWidth = 1.5;
+p.LineColor = 'k';
+[~,p] = contour(xx,yy,zz3./zz);
+p.LevelList = 0.9;
+p.LineWidth = 1.5;
+p.LineColor = 'k';
+
+[~,p] = contour(xx,yy,zz1./zz);
+p.LevelList = 0.6;
+p.LineWidth = 1.5;
+p.LineColor = 'k';
+p.LineStyle = '--';
+[~,p] = contour(xx,yy,zz2./zz);
+p.LevelList = 0.6;
+p.LineWidth = 1.5;
+p.LineColor = 'k';
+p.LineStyle = '--';
+[~,p] = contour(xx,yy,zz3./zz);
+p.LevelList = 0.6;
+p.LineWidth = 1.5;
+p.LineColor = 'k';
+p.LineStyle = '--';
+
+% white contour (parameter space in CESM)
+hstdat = load('wstar3ustar3_LaSL.mat');
+plot_dist_4p_l(hstdat.hst,hstdat.xi,hstdat.yi);
+
+% scatter data points
+ids3w = 2:5;
+ids3s = 6:nWV;
+xdat0 = lasl;
+ydat0 = b0.*hb./utau.^3;
+% group 1, wind waves
+xdat = xdat0(:,1,ids3w);
+ydat = ydat0(:,1,ids3w);
+plot(xdat(:),ydat(:),'ow','LineWidth',1.0);
+xdat = xdat0(:,2,ids3w);
+ydat = ydat0(:,2,ids3w);
+plot(xdat(:),ydat(:),'sw','LineWidth',1.0);
+xdat = xdat0(:,3,ids3w);
+ydat = ydat0(:,3,ids3w);
+plot(xdat(:),ydat(:),'dw','LineWidth',1.0);
+% group 2, swells
+xdat = xdat0(:,1,ids3s);
+ydat = ydat0(:,1,ids3s);
+scatter(xdat(:),ydat(:),'ow','filled');
+xdat = xdat0(:,2,ids3s);
+ydat = ydat0(:,2,ids3s);
+scatter(xdat(:),ydat(:),'sw','filled');
+xdat = xdat0(:,3,ids3s);
+ydat = ydat0(:,3,ids3s);
+scatter(xdat(:),ydat(:),'dw','filled');
+set(gca,'xscale','log')
+set(gca,'yscale','log')
+xlabel('$La_\mathrm{SL}$','Interpreter','latex');
+ylabel('$-h_\mathrm{b}/(\kappa L)$','Interpreter','latex');
+xlim(xlims);
+ylim(ylims);
+
+tx = text(0.12, 0.06,'Langmuir','Interpreter','Latex');
+tx.BackgroundColor = 'w';
+tx = text(4, 0.06,'Wind','Interpreter','Latex');
+tx.BackgroundColor = 'w';
+tx = text(3, 20,'Convection','Interpreter','Latex');
+tx.BackgroundColor = 'w';
+
+if (l_save_fig)
+    figname = 'fig9a_sct_wb_ParSpace.pdf';
+    postProcessFig(gcf, figname, 5, 5);
+end
+
 
 %% functions
 
@@ -657,6 +869,34 @@ function h = plotScatterAll(xdat0,ydat0,...
     h = gcf;
 end
 
+function h = plot_dist_4p_l(hst,xi,yi)
+% plot_dist_4p_l plot the highest 30%, 60%, 90% and 99%
+%   centered distribution
+
+    % find the isolines of pdf that enclose the area in which the
+    % total probability is 30%, 60%, 90% and 99%
+    hsum = sum(hst(:));
+    hlist = sort(hst(:),'descend')./hsum;
+    hcum = cumsum(hlist);
+    vl = [0.3, 0.6, 0.9, 0.99];
+    nv = numel(vl);
+    vlev = zeros(1,nv);
+    for i=1:nv
+        [~,ind] = min(abs(hcum-vl(i)));
+        vlev(i) = hlist(ind);
+    end
+    pdfData = hst./hsum;
+    % plot log10(pdfData) to make use of the full colarbar
+    pdfData(pdfData==0) = 1e-12;    % avoid -inf for log10(0)
+    [~,h] = contour(xi,yi,pdfData');
+    h.LevelListMode = 'manual';
+    h.LevelList = vlev;
+    h.LineColor = [0.9 0.9 0.9];
+    h.LineWidth = 1.0;
+    h.ShowText = 'on';
+    h.TextList = vl;
+end
+
 function h = newFigure(l_save_fig)
 % newFigure() creates new figure object. 
 %   Visible if l_save_fig = 0, invisible otherwise.
@@ -669,13 +909,27 @@ function h = newFigure(l_save_fig)
     h = gcf;
 end
 
-function postProcessFig(gcf, filename)
+function postProcessFig(gcf, filename, varargin)
 % postProcessFig resizes a figure, convert it to eps format
 %   postProcessFig(figname,[width, hight])
 
 % counts arguments
-wsize = 6;
-hsize = 4;
+% counts arguments
+nArgs = length(varargin);
+if nArgs==0
+    wsize = 6;
+    hsize = 4;
+elseif nArgs==2
+    if isnumeric(varargin{1}) && isnumeric(varargin{2})
+        wsize = varargin{1};
+        hsize = varargin{2};
+    else
+        error('Numeric arguments required...');
+    end
+else
+    error('No arguments or pass in width and hight');
+end
+
 mleft = 0.25;
 mdown = 0.25;
 mright = wsize-0.25;
